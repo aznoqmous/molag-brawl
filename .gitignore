@@ -72,3 +72,8 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 .vsconfig
+
+Assets/Fonts
+*.meta
+*.asset
+*.pdf
