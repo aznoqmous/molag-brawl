@@ -38,6 +38,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: _Ground
+    uniqueID: 708631311
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
@@ -49,4 +52,7 @@ TagManager:
     locked: 0
   - name: Bullet
     uniqueID: 2141323065
+    locked: 0
+  - name: UI
+    uniqueID: 2931326331
     locked: 0

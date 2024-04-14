@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +10,10 @@ public class Glyph : MonoBehaviour
     [SerializeField] Image _image;
     [SerializeField] Image _fillImage;
     [SerializeField] Image _triangleImage;
+    [SerializeField] Image _outerImage;
+    [SerializeField] Image _outerAnimated;
+    [SerializeField] Image _backgroundImage;
+
     float _life = 0f;
     float _lifeTime = 5f;
     float _size = 1f;
@@ -50,10 +53,20 @@ public class Glyph : MonoBehaviour
     {
         _life = 0.5f;
         transform.localScale = Vector3.zero;
+        _backgroundImage.color = GameManager.Instance.GroundColor;
+        AudioManager.Instance.PlaySFX(_placeAudioClip, Random.Range(0.9f, 1.1f));
     }
 
     void Update()
     {
+        if (_isVibrating)
+        {
+            _outerAnimated.transform.localScale += Vector3.one * Time.deltaTime;
+            Color color = _outerAnimated.color;
+            color.a = Mathf.Lerp(color.a, 0, Time.deltaTime * 2f);
+            _outerAnimated.color = color;
+        }
+
         _life = Mathf.Clamp01(_life);
 
         _fillImage.fillAmount = _life;
@@ -75,10 +88,11 @@ public class Glyph : MonoBehaviour
         _lifeTime = lifeTime;
     }
 
-    void Die()
+    public void Die()
     {
         Player.Instance.RemoveGlyph(this);
         Destroy(gameObject);
+        EntityManager.Instance.AddCredits();
         EntityManager.Instance.SpawnEnemy(transform.position);
     }
 
@@ -94,8 +108,30 @@ public class Glyph : MonoBehaviour
     public void Charge()
     {
         if (IsCharged) return;
+        _fillImage.color = GameManager.Instance.SoulColor;
+        _triangleImage.color = GameManager.Instance.SoulColor;
+
         _charge += Time.deltaTime / _chargeTime;
         _triangleImage.fillAmount = _charge;
-        if (IsCharged) transform.localScale = Vector3.one * 1.5f * _size;
+        
+        if (IsCharged)
+        {
+            transform.localScale = Vector3.one * 1.5f * _size;
+            Vibrate();
+        }
     }
+
+    bool _isVibrating = false;
+    public void Vibrate()
+    {
+        _isVibrating = true;
+        AudioManager.Instance.PlaySFX(_chargedAudioClips.PickRandom());
+        _fillImage.color = Color.white;
+        _triangleImage.color = Color.white;
+        _outerAnimated.transform.localScale = Vector3.one;
+        _outerAnimated.color = Color.white;
+    }
+
+    [SerializeField] AudioClip _placeAudioClip;
+    [SerializeField] List<AudioClip> _chargedAudioClips;
 }

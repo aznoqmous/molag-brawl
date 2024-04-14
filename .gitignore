@@ -77,3 +77,7 @@ Assets/Fonts
 *.meta
 *.asset
 *.pdf
+*.wav
+*.png
+*.psb
+Captures

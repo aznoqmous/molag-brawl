@@ -12,14 +12,20 @@ public class Enemy : MonoBehaviour
     [SerializeField] float _size = 0.5f;
     [SerializeField] Soul _soulPrefab;
     [SerializeField] List<SpriteRenderer> _spritesRenderers = new List<SpriteRenderer>();
+
+    [Header("Audio")]
+    [SerializeField] List<AudioClip> _damageAudioClips;
+
     Material _material;
 
     Vector2 _direction;
 
-    float _maxHealth = 3f;
+    [SerializeField] float _maxHealth = 3f;
     float _currentHealth = 3f;
     float _damageTime = 0f;
 
+    [SerializeField] float _cost = 1f;
+    public float Cost {get {return _cost; }}
     
     public bool IsAlive { get { return _currentHealth > 0; } }
 
@@ -68,6 +74,13 @@ public class Enemy : MonoBehaviour
         if (!IsAlive) Die();
         transform.localScale = new Vector3(_size * 1.2f, _size * 0.8f, _size);
         _damageTime = 1f;
+
+        /*
+        _damageAudioSource.pitch = Random.Range(0.9f, 1.1f);
+        _damageAudioSource.Play();
+        */
+
+        //AudioManager.Instance.PlaySFX(_damageAudioClips.PickRandom());
     }
 
     public void Die() {
@@ -77,16 +90,27 @@ public class Enemy : MonoBehaviour
     }
 
     float _lastGlyphDamageTime = 0f;
-    float _glyphDamageFreq = 0.5f;
     private void OnTriggerStay2D(Collider2D collision)
     {
         if(Player.Instance.IsActivated && collision.GetComponent<GlyphCollider>() != null)
         {
-            if(Time.time - _lastGlyphDamageTime > _glyphDamageFreq)
-            {
-                TakeDamage();
-                _lastGlyphDamageTime = Time.time;
-            }
+            TakeGlyphDamage();
+
+        }
+        else if(collision.GetComponent<Glyph>() != null)
+        {
+            /*TakeDamage(1f);
+            Physics2D.IgnoreCollision(collision, _collider);*/
+            TakeGlyphDamage();
+        }
+    }
+
+    public void TakeGlyphDamage(float amount = 1)
+    {
+        if (Time.time - _lastGlyphDamageTime > Player.Instance.TickTime)
+        {
+            TakeDamage(Player.Instance.TickDamage);
+            _lastGlyphDamageTime = Time.time;
         }
     }
 

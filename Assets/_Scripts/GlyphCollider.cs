@@ -31,11 +31,4 @@ public class GlyphCollider : MonoBehaviour
         }
     }
 
-    public void UpdateEnemies()
-    {
-
-        _enemies = _enemies.Where((Enemy enemy) => enemy.IsAlive).ToList();
-    }
-
-
 }
